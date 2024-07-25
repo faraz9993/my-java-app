@@ -4,14 +4,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/faraz9993/my-java-app.git', branch: env.BRANCH_NAME
+                git url: 'https://github.com/faraz9993/my-java-app.git', branch: env.CHANGE_BRANCH
             }
         }
 
         stage('Build') {
             steps {
                 script {
-                    echo "Building production branch: ${env.BRANCH_NAME}"
+                    echo "Building pull request branch: ${env.CHANGE_BRANCH}"
                     withMaven(maven: 'Maven-3.9.0') {
                         sh 'mvn clean package'
                     }
@@ -19,14 +19,13 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            when {
-                branch 'master'
-            }
+        stage('Test') {
             steps {
                 script {
-                    echo "Deploying to production from branch: ${env.BRANCH_NAME}"
-                    sh 'deploy.sh'
+                    echo "Running tests on pull request branch: ${env.CHANGE_BRANCH}"
+                    withMaven(maven: 'Maven-3.9.0') {
+                        sh 'mvn test'
+                    }
                 }
             }
         }
