@@ -1,27 +1,46 @@
-//Jenkinsfile
 pipeline {
     agent any
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building the Java application...'
-                sh 'mvn clean package'
+                git url: 'https://github.com/faraz9993/my-java-app.git', branch: env.BRANCH_NAME
             }
         }
-        stage('Test') {
+
+        stage('Build') {
             steps {
-                echo 'Running tests...'
-                // Add your test commands here if you have testing
+                script {
+                    echo "Building production branch: ${env.BRANCH_NAME}"
+                    withMaven(maven: 'Maven-3.9.0') {
+                        sh 'mvn clean package'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    echo "Deploying to production from branch: ${env.BRANCH_NAME}"
+                    sh 'deploy.sh'
+                }
             }
         }
     }
+
     post {
+        always {
+            echo 'Pipeline finished.'
+        }
         success {
-            echo 'Build and test succeeded!'
+            echo 'Pipeline succeeded.'
         }
         failure {
-            echo 'Build or test failed!'
+            echo 'Pipeline failed.'
         }
     }
 }
-
