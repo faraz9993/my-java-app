@@ -21,7 +21,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                branch 'master'
+                branch 'feature-branch-1'
             }
             steps {
                 script {
