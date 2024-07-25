@@ -26,7 +26,6 @@ pipeline {
             steps {
                 script {
                     echo "Deploying to production from branch: ${env.BRANCH_NAME}"
-                    sh 'deploy.sh'
                 }
             }
         }
